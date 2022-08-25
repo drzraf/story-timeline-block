@@ -372,6 +372,10 @@ const attributes = {
 		type:"string",
 		default:"white"
 	},
+	initialBlockPosition:{
+		type:"string",
+                default:"right"
+	},
 }
 
 export default attributes

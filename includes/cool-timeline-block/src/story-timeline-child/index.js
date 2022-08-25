@@ -29,16 +29,17 @@ registerBlockType( "cp-timeline/content-timeline-block-child", {
 		inserter: false,	
 	},
 	attributes,
+        usesContext: ['cp-timeline/timelineDesign', 'cp-timeline/timelineLayout', 'cp-timeline/initialBlockPosition'],
 	edit: props =>{
-		const chilblockProps = useBlockProps( {
-			className: 'swiper-slide',
-		  } );
-		return(
-		
-		<div {...chilblockProps}>
-			<Edit {...props} />
-		</div>
-		)
+	        const chilblockProps = useBlockProps( {
+		        className: 'swiper-slide',
+	        } );
+
+	        return(
+		        <div {...chilblockProps}>
+		          <Edit {...props} />
+		        </div>
+	        )
 	},
 	save: props =>{
 		const chilblockProps = useBlockProps.save({className: 'swiper-slide'});

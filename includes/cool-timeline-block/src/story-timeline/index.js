@@ -95,6 +95,11 @@ registerBlockType( "cp-timeline/content-timeline-block", {
 	
 		</div> );
 	},
+        providesContext: {
+            'cp-timeline/timelineLayout': 'timelineLayout',
+            'cp-timeline/timelineDesign': 'timelineDesign',
+            'cp-timeline/initialBlockPosition': 'initialBlockPosition',
+        },
 	example: {
 		attributes: {
 			backgroundColor: '#000000',

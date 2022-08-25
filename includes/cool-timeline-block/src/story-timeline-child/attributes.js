@@ -113,20 +113,22 @@ const attributes = {
 		default:true
 		
 	},
-	timelineLayout:{
+	timelineLayout:{ // context
 		type:"string",
 		default:"vertical"
 	},
 
-	timelineDesign:{
+	timelineDesign:{ // context
 		type:"string",
 		default:"both-sided"
 	},
 	imageOption:{
 		type:"array",
 		default:[{label:"Full",value:"full"}]
-	}
-		
+	},
+	initialBlockPosition:{ // context
+		type:"string",
+	},
 }
 
 export default attributes

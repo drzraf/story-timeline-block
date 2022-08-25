@@ -41,7 +41,8 @@ const {
 	ToolbarDropdownMenu,
 	Spinner,
 	ColorPicker,
-	ColorPalette 
+	ColorPalette,
+        RadioControl
 } = wp.components
 
 const {
@@ -126,8 +127,8 @@ render() {
 				Orientation,
 				timelineDesign,
 				slidePerView,
-				iconColor
-			
+				iconColor,
+			        initialBlockPosition
 				
 			},
 		} = this.props
@@ -275,9 +276,6 @@ render() {
 								setAttributes({timelineLayout:value})
 								jQuery(".timeline-block-pre-loader").css('display','block')
 							}
-							select('core/block-editor').getBlocksByClientId(this.props.clientId)[0].innerBlocks.forEach(function (block,key) {
-								dispatch('core/block-editor').updateBlockAttributes(block.clientId, ({ timelineLayout: value }))
-							})
 						}
 					}
 						options={ [
@@ -290,12 +288,10 @@ render() {
 						label={ __( "Timeline Design" ) }
 						value={ timelineDesign }
 						onChange={ ( value ) => {setAttributes( { timelineDesign: value } )
-						select('core/block-editor').getBlocksByClientId(this.props.clientId)[0].innerBlocks.forEach(function (block,key) {
-							dispatch('core/block-editor').updateBlockAttributes(block.clientId, ({ timelineDesign: value }))
-						})
 					} }
 						options={ [
 							{ value: "both-sided", label: __( "Both Sided") },
+							{ value: "alt-sided", label: __( "Alternating side") },
 							{ value: "one-sided", label: __( "One Sided",) },
 							
 						] }
@@ -314,6 +310,23 @@ render() {
 					// 	step={ 1 }
 					// />
 					}
+
+					{
+	                                    timelineLayout == "vertical" && timelineDesign == "alt-sided" ?
+						<RadioControl
+							label="First story position"
+							selected={ initialBlockPosition }
+							options={ [
+								{ label: 'Left', value:"left"},
+								{ label: 'Right', value:"right"},
+							] } 
+							onChange={
+                                                            ( value ) => setAttributes({initialBlockPosition: value})
+                                                        }
+						/>
+						:null
+		                        }
+
 
 					{timelineDesign == "one-sided" && timelineLayout == "vertical" ? orientation_setting : null }
 			</PanelBody>
@@ -387,6 +400,10 @@ render() {
 									onClick: () => setAttributes({timelinDesign:"both-sided"}) ,
 								},
 								{
+									title: 'Alternating side',
+									onClick: () => setAttributes({timelinDesign:"alt-sided"}) ,
+								},
+								{
 									title: 'One Sided',
 									onClick: () => setAttributes({timelinDesign:"one-sided"}),
 								},
@@ -400,7 +417,7 @@ render() {
 					{loadDateGoogleFonts }
 				
 				<div className={"cool-timeline-block-" + this.props.clientId + " cool-timeline-block"}>
-								<div className={"cool-" + timelineLayout + "-timeline-body " + timelineDesign + " " + Orientation + ""}>
+								<div className={"cool-" + (timelineLayout == 'alt-sided' ? 'both-sided' : timelineLayout) + "-timeline-body " + timelineDesign + " " + Orientation + ""}>
 									<div className="list">
 									{timelineLayout == "vertical" ?
 										<InnerBlocks
@@ -433,7 +450,6 @@ render() {
 		
 		let timelineLayout= this.props.attributes.timelineLayout
 		let timelineDesign= this.props.attributes.timelineDesign
-		
 	}
 	
 	componentDidUpdate(){
