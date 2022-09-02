@@ -432,7 +432,7 @@ const attributes = {
       value: "full"
     }]
   },
-  initialBlockPosition: {
+  firstBlockPosition: {
     // context
     type: "string"
   }
@@ -503,29 +503,6 @@ class Edit extends Component {
   getBlockIndex() {
     let root_id = select("core/block-editor").getBlockRootClientId(this.props.clientId);
     return select("core/block-editor").getBlockIndex(this.props.clientId, root_id);
-  }
-
-  getPosition() {
-    const {
-      attributes: {
-        block_position_active,
-        blockPosition
-      },
-      context: {
-        'cp-timeline/timelineDesign': timelineDesign,
-        'cp-timeline/timelineLayout': timelineLayout,
-        'cp-timeline/initialBlockPosition': initialBlockPosition
-      }
-    } = this.props;
-    let order = timelineDesign === 'alt-sided' ? [initialBlockPosition, initialBlockPosition == "right" ? "left" : "right"] : ['right', 'left'],
-        pos = blockPosition;
-
-    if (block_position_active == false || timelineDesign === 'alt-sided') {
-      pos = order[this.getBlockIndex() % 2];
-    }
-
-    console.log("index", this.getBlockIndex(), "pos=", pos);
-    return pos;
   }
 
   render() {
@@ -760,7 +737,7 @@ class Edit extends Component {
     }))), content_control, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
       className: "timeline-content icon-" + iconToggle + ""
     }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-      className: " timeline-block-vertical-timeline ctl-row position-" + this.getPosition()
+      className: " timeline-block-vertical-timeline ctl-row position-" + blockPosition
     }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
       className: "ctl-6 timeline-block-time"
     }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
@@ -822,7 +799,7 @@ registerBlockType("cp-timeline/content-timeline-block-child", {
     inserter: false
   },
   attributes: _attributes__WEBPACK_IMPORTED_MODULE_4__["default"],
-  usesContext: ['cp-timeline/timelineDesign', 'cp-timeline/timelineLayout', 'cp-timeline/initialBlockPosition'],
+  usesContext: ['cp-timeline/timelineDesign', 'cp-timeline/timelineLayout', 'cp-timeline/firstBlockPosition'],
   edit: props => {
     const chilblockProps = useBlockProps({
       className: 'swiper-slide'

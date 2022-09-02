@@ -29,7 +29,7 @@ const {
 	BlockAlignmentToolbar,
 	PanelColorSettings,
 	InnerBlocks,
-	
+
 } = wp.blockEditor
 
 const {
@@ -37,7 +37,7 @@ const {
 	SelectControl,
 	RangeControl,
 	TabPanel,
-	Toolbar, 
+	Toolbar,
 	ToolbarDropdownMenu,
 	Spinner,
 	ColorPicker,
@@ -58,23 +58,36 @@ const ALLOWED_BLOCKS = [ "cp-timeline/content-timeline-block-child" ]
 const $ = jQuery;
 
 class Edit extends Component {
-
+	constructor() {
+		super();
+		this.onUpdateFirstBlockPosition = this.onUpdateFirstBlockPosition.bind(this);
+	}
 
 	addBlock(e){
-	
+
 		let index = wp.data.select("core/block-editor").getBlockCount(this.props.clientId)
-		
+
 		let name = 'cp-timeline/content-timeline-block-child';
 		let insertedBlock = wp.blocks.createBlock(name, {block_position_active:false
 		}	);
-		wp.data.dispatch('core/block-editor').insertBlocks(insertedBlock,index+1,this.props.clientId);	
+		wp.data.dispatch('core/block-editor').insertBlocks(insertedBlock,index+1,this.props.clientId);
 		let blocksCount = wp.data.select("core/block-editor").getBlockCount(this.props.clientId)
-		
+
 			}
 
-		
+	onUpdateFirstBlockPosition(firstBlockPosition) {
+		this.props.setAttributes({firstBlockPosition: firstBlockPosition});
+		const blocks = wp.data.select("core/block-editor").getBlock(this.props.clientId).innerBlocks;
+		const oddPosition = firstBlockPosition;
+		const evenPosition = firstBlockPosition === 'left' ? 'right' : 'left';
+
+		blocks.forEach((block, index) => {
+			block.attributes.blockPosition = (index % 2 === 1 ? oddPosition : evenPosition);
+		});
+	}
+
 render() {
-	
+
 		// Setup the attributes.
 		const {
 			setAttributes,
@@ -128,11 +141,10 @@ render() {
 				timelineDesign,
 				slidePerView,
 				iconColor,
-			        initialBlockPosition
-				
+				firstBlockPosition
 			},
 		} = this.props
-		
+
 		const colors = [
 			{ name: 'red', color: '#f00' },
 			{ name: 'white', color: '#fff' },
@@ -143,7 +155,7 @@ render() {
 		if( element ) {
 			element.innerHTML = contentTimelineStyle( this.props )
 			}
-		
+
 		const orientation_setting= <SelectControl
 						label={ __( "Alignment" ) }
 						value={ Orientation }
@@ -177,7 +189,7 @@ render() {
 			colors = {colors}
 			value={headingColor}
             onChange = {( colorValue ) => setAttributes( { headingColor: colorValue } )}
-			
+
         />
 		<hr className="timeline-block-editor__separator"></hr>
 		<h2 style={{'font-weight':600}}>Story Description</h2>
@@ -203,7 +215,7 @@ render() {
 			colors = {colors}
             value={subHeadingColor}
             onChange = {( colorValue ) => setAttributes( { subHeadingColor: colorValue } )}
-			
+
         />
 		<hr className="timeline-block-editor__separator"></hr>
 		<h2 style={{'font-weight':600}}>Primary Label(Date/Steps)</h2>
@@ -229,10 +241,10 @@ render() {
 			colors = {colors}
             value={dateColor}
             onChange = {( colorValue ) => setAttributes( { dateColor: colorValue} )}
-			
+
         />
-		
-	</PanelBody> 
+
+	</PanelBody>
 	const advanced_setting =
 				<PanelBody title={__("Advanced Settings")} initialOpen={ false }>
 				<h2>Line Color</h2>
@@ -241,7 +253,7 @@ render() {
 				value={LineColor}
 				onChange = {( colorValue ) => setAttributes( { LineColor: colorValue} )}
 				/>
-				
+
 				<h2>Icon Color</h2>
 				<ColorPalette
 				colors = {colors}
@@ -261,7 +273,7 @@ render() {
 				value={storyBorderColor}
 				onChange = {( colorValue ) => setAttributes( { storyBorderColor: colorValue } )}
 				/>
-					
+
 			</PanelBody>
 		const timeline_setting = <InspectorControls>
 			<PanelBody title={__("Timeline Settings")} >
@@ -280,7 +292,7 @@ render() {
 					}
 						options={ [
 							{ value: "vertical", label: __( "Vertical") }
-							
+
 						] }
 						/>
 					{timelineLayout == "vertical" ?
@@ -291,9 +303,9 @@ render() {
 					} }
 						options={ [
 							{ value: "both-sided", label: __( "Both Sided") },
-							{ value: "alt-sided", label: __( "Alternating side") },
+							{ value: "alternating-sided", label: __( "Alternating Sided") },
 							{ value: "one-sided", label: __( "One Sided",) },
-							
+
 						] }
 						/>
 						:
@@ -312,20 +324,20 @@ render() {
 					}
 
 					{
-	                                    timelineLayout == "vertical" && timelineDesign == "alt-sided" ?
+						timelineLayout == "vertical" && timelineDesign == "alternating-sided" ?
 						<RadioControl
 							label="First story position"
-							selected={ initialBlockPosition }
+							selected={ firstBlockPosition }
 							options={ [
 								{ label: 'Left', value:"left"},
 								{ label: 'Right', value:"right"},
-							] } 
+							] }
 							onChange={
-                                                            ( value ) => setAttributes({initialBlockPosition: value})
-                                                        }
+								( value ) => { this.onUpdateFirstBlockPosition(value) }
+							}
 						/>
 						:null
-		                        }
+					}
 
 
 					{timelineDesign == "one-sided" && timelineLayout == "vertical" ? orientation_setting : null }
@@ -384,8 +396,8 @@ render() {
 					)
 				}
 
-				
-				
+
+
 				return (
 					<Fragment>
 						  <div>
@@ -396,12 +408,12 @@ render() {
 							label="Layout"
 							controls={ [
 								{
-									title: 'Both Sided',                  
+									title: 'Both Sided',
 									onClick: () => setAttributes({timelinDesign:"both-sided"}) ,
 								},
 								{
 									title: 'Alternating side',
-									onClick: () => setAttributes({timelinDesign:"alt-sided"}) ,
+									onClick: () => setAttributes({timelinDesign:"alternating-sided"}) ,
 								},
 								{
 									title: 'One Sided',
@@ -415,50 +427,50 @@ render() {
 					 {loadSubHeadGoogleFonts }
 					{timeline_setting}
 					{loadDateGoogleFonts }
-				
+
 				<div className={"cool-timeline-block-" + this.props.clientId + " cool-timeline-block"}>
-								<div className={"cool-" + (timelineLayout == 'alt-sided' ? 'both-sided' : timelineLayout) + "-timeline-body " + timelineDesign + " " + Orientation + ""}>
+								<div className={"cool-" + (timelineLayout == 'alternating-sided' ? 'both-sided' : timelineLayout) + "-timeline-body " + timelineDesign + " " + Orientation + ""}>
 									<div className="list">
 									{timelineLayout == "vertical" ?
 										<InnerBlocks
                                             allowedBlocks={ALLOWED_BLOCKS}
                                             orientation="vertical"
                                             template={ getContentTimelineTemplate( timelineItem, tm_content ) }
-                                            
+
                                             />:
 											<LayoutInit />
 										}
-								</div>	
+								</div>
 							</div><div onClick={e => this.addBlock(e)} className="timeline-block-add-story">
 									<button type="button" visible="true" className="components-button block-editor-button-block-appender is-primary" aria-label="Add Story"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-hidden="true" focusable="false"><path d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z"></path></svg>Add Story</button>
 								</div>
 								</div>
 			</div>
 				</Fragment>
-		
+
 		)
 	}
 
 	componentDidMount() {
 		// //Store client id.
 		this.props.setAttributes( { block_id: this.props.clientId } )
-		
+
 		// Pushing Style tag for this block css.
 		const $style = document.createElement( "style" )
 		$style.setAttribute( "id", "cool-vertical-timeline-style-" + this.props.clientId )
 		document.head.appendChild( $style )
-		
+
 		let timelineLayout= this.props.attributes.timelineLayout
 		let timelineDesign= this.props.attributes.timelineDesign
 	}
-	
+
 	componentDidUpdate(){
-		let clientId= this.props.clientId 
-		
-		
-		
+		let clientId= this.props.clientId
+
+
+
 
 	}
 
-}export default 
+}export default
 ( Edit )

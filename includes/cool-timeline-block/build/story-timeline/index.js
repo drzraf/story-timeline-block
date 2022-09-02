@@ -8584,7 +8584,7 @@ const attributes = {
     type: "string",
     default: "white"
   },
-  initialBlockPosition: {
+  firstBlockPosition: {
     type: "string",
     default: "right"
   }
@@ -8669,6 +8669,11 @@ const ALLOWED_BLOCKS = ["cp-timeline/content-timeline-block-child"];
 const $ = jQuery;
 
 class Edit extends Component {
+  constructor() {
+    super();
+    this.onUpdateFirstBlockPosition = this.onUpdateFirstBlockPosition.bind(this);
+  }
+
   addBlock(e) {
     let index = wp.data.select("core/block-editor").getBlockCount(this.props.clientId);
     let name = 'cp-timeline/content-timeline-block-child';
@@ -8677,6 +8682,18 @@ class Edit extends Component {
     });
     wp.data.dispatch('core/block-editor').insertBlocks(insertedBlock, index + 1, this.props.clientId);
     let blocksCount = wp.data.select("core/block-editor").getBlockCount(this.props.clientId);
+  }
+
+  onUpdateFirstBlockPosition(firstBlockPosition) {
+    this.props.setAttributes({
+      firstBlockPosition: firstBlockPosition
+    });
+    const blocks = wp.data.select("core/block-editor").getBlock(this.props.clientId).innerBlocks;
+    const oddPosition = firstBlockPosition;
+    const evenPosition = firstBlockPosition === 'left' ? 'right' : 'left';
+    blocks.forEach((block, index) => {
+      block.attributes.blockPosition = index % 2 === 1 ? oddPosition : evenPosition;
+    });
   }
 
   render() {
@@ -8733,7 +8750,7 @@ class Edit extends Component {
         timelineDesign,
         slidePerView,
         iconColor,
-        initialBlockPosition
+        firstBlockPosition
       }
     } = this.props;
     const colors = [{
@@ -9036,8 +9053,8 @@ class Edit extends Component {
         value: "both-sided",
         label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("Both Sided")
       }, {
-        value: "alt-sided",
-        label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("Alternating side")
+        value: "alternating-sided",
+        label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("Alternating Sided")
       }, {
         value: "one-sided",
         label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_8__.__)("One Sided")
@@ -9053,9 +9070,9 @@ class Edit extends Component {
     // 	max={ 4 }
     // 	step={ 1 }
     // />
-    , timelineLayout == "vertical" && timelineDesign == "alt-sided" ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(RadioControl, {
+    , timelineLayout == "vertical" && timelineDesign == "alternating-sided" ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(RadioControl, {
       label: "First story position",
-      selected: initialBlockPosition,
+      selected: firstBlockPosition,
       options: [{
         label: 'Left',
         value: "left"
@@ -9063,9 +9080,9 @@ class Edit extends Component {
         label: 'Right',
         value: "right"
       }],
-      onChange: value => setAttributes({
-        initialBlockPosition: value
-      })
+      onChange: value => {
+        this.onUpdateFirstBlockPosition(value);
+      }
     }) : null, timelineDesign == "one-sided" && timelineLayout == "vertical" ? orientation_setting : null), general_setting, advanced_setting);
     const getContentTimelineTemplate = memize__WEBPACK_IMPORTED_MODULE_3___default()((icon_block, tm_content) => {
       return lodash_times__WEBPACK_IMPORTED_MODULE_2___default()(icon_block, n => ['cp-timeline/content-timeline-block-child', tm_content[n]]);
@@ -9120,7 +9137,7 @@ class Edit extends Component {
       }, {
         title: 'Alternating side',
         onClick: () => setAttributes({
-          timelinDesign: "alt-sided"
+          timelinDesign: "alternating-sided"
         })
       }, {
         title: 'One Sided',
@@ -9131,7 +9148,7 @@ class Edit extends Component {
     })) : null, loadHeadGoogleFonts, loadSubHeadGoogleFonts, timeline_setting, loadDateGoogleFonts, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
       className: "cool-timeline-block-" + this.props.clientId + " cool-timeline-block"
     }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
-      className: "cool-" + (timelineLayout == 'alt-sided' ? 'both-sided' : timelineLayout) + "-timeline-body " + timelineDesign + " " + Orientation + ""
+      className: "cool-" + (timelineLayout == 'alternating-sided' ? 'both-sided' : timelineLayout) + "-timeline-body " + timelineDesign + " " + Orientation + ""
     }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
       className: "list"
     }, timelineLayout == "vertical" ? (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(InnerBlocks, {
@@ -9296,7 +9313,7 @@ registerBlockType("cp-timeline/content-timeline-block", {
   providesContext: {
     'cp-timeline/timelineLayout': 'timelineLayout',
     'cp-timeline/timelineDesign': 'timelineDesign',
-    'cp-timeline/initialBlockPosition': 'initialBlockPosition'
+    'cp-timeline/firstBlockPosition': 'firstBlockPosition'
   },
   example: {
     attributes: {

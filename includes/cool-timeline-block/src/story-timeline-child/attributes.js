@@ -95,11 +95,11 @@ const attributes = {
 	stack: {
 		type: "string",
 		default: "tablet"
-	},	
+	},
 	iconType: {
 		type: "string",
 		default: "icon-library"
-	},	
+	},
 	iconToggle: {
 		type: "string",
 		default: "false"
@@ -107,11 +107,11 @@ const attributes = {
 	blockPosition:{
 		type:"string",
 	},
-		
+
 	block_position_active:{
 		type:"boolean",
 		default:true
-		
+
 	},
 	timelineLayout:{ // context
 		type:"string",
@@ -126,7 +126,7 @@ const attributes = {
 		type:"array",
 		default:[{label:"Full",value:"full"}]
 	},
-	initialBlockPosition:{ // context
+	firstBlockPosition:{ // context
 		type:"string",
 	},
 }

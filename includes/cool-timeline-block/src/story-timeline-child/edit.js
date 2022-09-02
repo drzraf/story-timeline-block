@@ -22,42 +22,18 @@ const {
 } = wp.components;
 
 let svg_icons = Object.keys( CTBIcon );
- 
+
 class Edit extends Component {
 	componentDidMount() {
 		// Store client id.
 		this.props.setAttributes( { block_id: this.props.clientId } );
 	}
 
-        getBlockIndex() {
+	getBlockIndex() {
 		let root_id = select("core/block-editor").getBlockRootClientId(this.props.clientId);
-                return select("core/block-editor").getBlockIndex(this.props.clientId,root_id);
-        }
+		return select("core/block-editor").getBlockIndex(this.props.clientId,root_id);
+	}
 
-        getPosition() {
-		const {
-			attributes: {
-				block_position_active,
-				blockPosition,
-			},
-                        context: {
-				'cp-timeline/timelineDesign': timelineDesign,
-				'cp-timeline/timelineLayout': timelineLayout,
-                                'cp-timeline/initialBlockPosition': initialBlockPosition
-                        }
-		} = this.props;
-
-                let order = timelineDesign === 'alt-sided' ? [initialBlockPosition, initialBlockPosition == "right" ? "left" : "right"] : ['right', 'left'],
-                    pos = blockPosition;
-
-		if (block_position_active == false || timelineDesign === 'alt-sided') {
-			pos = order[this.getBlockIndex() % 2];
-		}
-
-                console.log("index", this.getBlockIndex(), "pos=", pos);
-                return pos;
-        }
-	
 	render() {
 		// Setup the attributes.
 		const {
@@ -75,20 +51,20 @@ class Edit extends Component {
 				imageOption,
 				timeLineImage
 			},
-                        context: {
+			context: {
 				'cp-timeline/timelineDesign': timelineDesign,
 				'cp-timeline/timelineLayout': timelineLayout,
-                        }
+			}
 		} = this.props;
 
-                const getImage = (size,image_value) => {
+			const getImage = (size,image_value) => {
 			let image_size_url= "";
 			if (timelineLayout == "vertical") {
 				let images=Object.entries(image_value);
 				images.map(image=>{
 					if(image[0] == size){
 						image_size_url = image[1].url;
-					} 
+					}
 				});
 			}
 			else {
@@ -138,7 +114,7 @@ class Edit extends Component {
 				      }
 				    </Fragment>
 			    ) }
-                            
+
                           />
 
 			  <div className="story-content">
@@ -148,7 +124,7 @@ class Edit extends Component {
 			      value={ time_heading }
 			      onChange={ ( value ) => setAttributes( { time_heading: value } ) }
 			      keepplaceholderonfocus="true"
-			      
+
 			    />
 
 			    <RichText
@@ -157,7 +133,7 @@ class Edit extends Component {
 			      value={ time_desc }
 			      onChange={ ( value ) => setAttributes({time_desc:value})}
 			      keepplaceholderonfocus="true"
-			      
+
 			    />
 			  </div>
 			</div>
@@ -168,14 +144,14 @@ class Edit extends Component {
 			  tagName="p"
 			  placeholder={ __( 'Date / Custom Text', 'timeline-block' ) }
 			  value={t_date}
-			  onChange={ ( value ) => setAttributes({t_date:value})}										
+			  onChange={ ( value ) => setAttributes({t_date:value})}
 			/>
 		);
 
 		const content_control = (
 			<InspectorControls>
 			  <PanelBody title={__("Story Setting")}>
-			    <TextControl 
+			    <TextControl
 			      label="Story Heading"
 			      value={ time_heading }
 			      onChange={ ( value ) => setAttributes({time_heading:value})}
@@ -187,7 +163,7 @@ class Edit extends Component {
 			      onChange={ ( value ) => setAttributes({time_desc:value})}
 			    />
 
-			    <TextControl 
+			    <TextControl
 			      label="Primary Label(Date/Steps)"
 			      value={ t_date }
 			      onChange={ ( value ) => setAttributes({t_date:value})}
@@ -200,7 +176,7 @@ class Edit extends Component {
 				  options={ [
 					  { label: 'Left',value:"left"},
 					  { label: 'Right',value:"right"},
-				  ] } 
+				  ] }
 				  onChange={( value )=>setAttributes({blockPosition:value,block_position_active:true})}
 				/>
 				:null
@@ -235,7 +211,7 @@ class Edit extends Component {
 					}
 				      </Fragment>
 			      ) }
-			      
+
                             />
 
 			    {timelineLayout == "vertical" && timeLineImage !== "none"  ?
@@ -259,14 +235,14 @@ class Edit extends Component {
 			      options={ [
 				      { label: 'Default(dot)',value:"false"},
 				      { label: 'Custom(Font Awesome Icon)',value:"true"},
-			      ] } 
+			      ] }
 			      onChange={( value )=>setAttributes({iconToggle:value})}
 			    />
 			    {iconToggle == "true" ?
 			     <Fragment> <div className="timeline-block-iconpicker" ><FontIconPicker {...icon_props} /> </div>
-			       
+
 			     </Fragment>
-			     : null}	
+			     : null}
 			  </PanelBody>
 			</InspectorControls>
 		);
@@ -287,20 +263,20 @@ class Edit extends Component {
 			  </BlockControls>
 			  {content_control}
 			  <div className={"timeline-content icon-"+iconToggle+""}>
-			    <div className = {" timeline-block-vertical-timeline ctl-row position-" + this.getPosition()}>
-			      
+			    <div className = {" timeline-block-vertical-timeline ctl-row position-" + blockPosition}>
+
 			      <div className="ctl-6 timeline-block-time">
 				<div className="story-time">
 				  {StoryTime()}
 				</div>
 			      </div>
 			      {icon_div}
-			      <div className="ctl-6 timeline-block-detail">						
-				{StoryDetail()} 
+			      <div className="ctl-6 timeline-block-detail">
+				{StoryDetail()}
 			      </div>
 			    </div>
 			  </div>
-			</Fragment>	 
+			</Fragment>
 		);
 	}
 }
