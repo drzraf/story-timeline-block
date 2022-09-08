@@ -77,9 +77,9 @@ class Edit extends Component {
 
 	onUpdateFirstBlockPosition(firstBlockPosition) {
 		this.props.setAttributes({firstBlockPosition: firstBlockPosition});
-		const blocks = wp.data.select("core/block-editor").getBlock(this.props.clientId).innerBlocks;
-		const oddPosition = firstBlockPosition;
-		const evenPosition = firstBlockPosition === 'left' ? 'right' : 'left';
+		const blocks = select("core/block-editor").getBlock(this.props.clientId).innerBlocks;
+		const evenPosition = firstBlockPosition;
+		const oddPosition = firstBlockPosition === 'left' ? 'right' : 'left';
 
 		blocks.forEach((block, index) => {
 			block.attributes.blockPosition = (index % 2 === 1 ? oddPosition : evenPosition);
@@ -409,15 +409,15 @@ render() {
 							controls={ [
 								{
 									title: 'Both Sided',
-									onClick: () => setAttributes({timelinDesign:"both-sided"}) ,
+									onClick: () => setAttributes({timelineDesign:"both-sided"}) ,
 								},
 								{
 									title: 'Alternating side',
-									onClick: () => setAttributes({timelinDesign:"alternating-sided"}) ,
+									onClick: () => setAttributes({timelineDesign:"alternating-sided"}) ,
 								},
 								{
 									title: 'One Sided',
-									onClick: () => setAttributes({timelinDesign:"one-sided"}),
+									onClick: () => setAttributes({timelineDesign:"one-sided"}),
 								},
 							] }
 							/>
@@ -462,6 +462,21 @@ render() {
 
 		let timelineLayout= this.props.attributes.timelineLayout
 		let timelineDesign= this.props.attributes.timelineDesign
+
+		// Recalculate alternating sides if new child block was added or removed
+		this.childCount = select("core/block-editor").getBlock(this.props.clientId).innerBlocks.length;
+		wp.data.subscribe(() => {
+			const currentChildCount = select("core/block-editor").getBlock(this.props.clientId).innerBlocks.length;
+			const childWasAddedOrRemoved = this.childCount !== currentChildCount;
+
+			this.childCount = currentChildCount;
+
+			if (!childWasAddedOrRemoved || this.props.attributes.timelineDesign !== 'alternating-sided') {
+				return;
+			}
+
+			this.onUpdateFirstBlockPosition(this.props.attributes.firstBlockPosition);
+		});
 	}
 
 	componentDidUpdate(){
