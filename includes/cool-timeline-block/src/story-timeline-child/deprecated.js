@@ -1,6 +1,6 @@
-import renderSVG from "../component/icon/renderIcon"
+import { IconPicker } from 'react-fa-icon-picker-alen';
 import {__} from '@wordpress/i18n';
-import attributes from "./attributes";
+import attributes from "./attributes.js";
 const {useBlockProps} = wp.blockEditor;
 const {RichText} = wp.blockEditor
 
@@ -49,7 +49,7 @@ export default [
 					/>
 				)
 				const icon_div = <div className="timeline-block-icon">
-					{icon !== "" && iconToggle == "true" ? <span className="timeline-block-render-icon" style={{fill: iconColor}}>{renderSVG(icon)}</span> : null}
+					{icon !== "" && iconToggle == "true" ? <span className="timeline-block-render-icon" style={{fill: iconColor}}><IconPickerItem icon={icon} size={24} color={iconColor} /></span> : null}
 				</div>
 
 				return (
